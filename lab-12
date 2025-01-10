@@ -1,0 +1,98 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class Demo extends StatefulWidget {
+  const Demo({super.key});
+
+  @override
+  State<Demo> createState() => _DemoState();
+}
+
+class _DemoState extends State<Demo> {
+  DateTime? selectedDate;
+  @override
+  Widget build(BuildContext context) {
+    List<String> cities = [
+      "Ahmedabad",
+      "Surat",
+      "Vadodara",
+      "Rajkot",
+      "Bhavnagar",
+      "Jamnagar",
+      "Junagadh",
+      "Gandhinagar",
+      "Anand",
+      "Nadiad",
+      "Morbi",
+      "Mehsana",
+      "Navsari",
+      "Vapi",
+      "Bharuch",
+      "Palanpur",
+      "Porbandar",
+      "Godhra",
+      "Dahod",
+      "Valsad"
+    ];
+    DateTime now = DateTime.now();
+
+    String f1 = DateFormat("dd-mm-yyyy").format(now);
+
+
+
+
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        child:Column(
+          children: [
+            Text(now.toString(),style: TextStyle(fontSize: 100),),
+            Text(f1,style: TextStyle(fontSize: 100),),
+            Text(selectedDate.toString(),style: TextStyle(fontSize: 100),),
+
+            ElevatedButton(onPressed: () async {
+             DateTime? date = await showDatePicker(
+                  context: context,
+                  initialDate:selectedDate ??  now,
+                  firstDate: DateTime(2000), lastDate: DateTime(3000));
+
+             if(date != null && selectedDate != date){
+               setState(() {
+                 selectedDate = date;
+               });
+             }
+            }, child: Text("pick date"))
+          ],
+        ) ,
+        // child: Column(
+        //   children: [
+        //     Container(color: Colors.red,height: 200,width: double.maxFinite,),
+        //     Container(color: Colors.blue,height: 200,width: double.maxFinite,),
+        //     Container(
+        //       color: Colors.yellowAccent,height: 200,width: double.maxFinite,
+        //       child: ListView.builder(
+        //         itemCount: cities.length,
+        //         itemBuilder: (context, index) {
+        //         return Text(cities[index],style: TextStyle(fontSize: 20),);
+        //       },),
+        //     ),
+        //     Container(color: Colors.green,height: 200,width: double.maxFinite,
+        //       child: GridView.builder(
+        //         itemCount: cities.length,
+        //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5,childAspectRatio: 5),
+        //           itemBuilder: (context, index) {
+        //             return Padding(
+        //               padding: const EdgeInsets.all(8.0),
+        //               child: Container(
+        //                   color: Colors.grey,child: Text(cities[index],style: TextStyle(fontSize: 20))),
+        //             );
+        //           },),
+        //     ),
+        //     Container(color: Colors.red,height: 200,width: double.maxFinite,),
+        //   ],
+        // ),
+      ),
+    );
+  }
+}
+
