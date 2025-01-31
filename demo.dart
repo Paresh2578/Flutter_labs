@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/Page1.dart';
-import 'package:untitled/Page2.dart';
-import 'package:untitled/home.dart';
+import 'package:intl/intl.dart';
+import 'package:p_1/AboutPage.dart';
+import 'package:p_1/Contact.dart';
+import 'package:p_1/HomePage.dart';
+import 'package:p_1/database/database.dart';
 
 class Demo extends StatefulWidget {
   const Demo({super.key});
@@ -11,26 +13,67 @@ class Demo extends StatefulWidget {
 }
 
 class _DemoState extends State<Demo> {
-  int idx = 0;
+  MyDatabase databse = MyDatabase();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // selectAll();
+  }
+
+  Future<void> selectAll() async {
+    // await databse.insertState();
+    await databse.selectAllState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> list = [
-       Home(),Page1(),Page2()
-    ];
-    return Scaffold(
-      body: list[idx],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: idx,
-        onTap: (value) {
-          setState(() {
-            idx = value;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home),label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.abc),label: "Page1"),
-          BottomNavigationBarItem(icon: Icon(Icons.ac_unit),label: "Page2"),
-        ],
+    return SafeArea(
+      child: Scaffold(
+        body: FutureBuilder(
+          future: databse.selectAllState(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(snapshot.data![index]["state_name"]),
+                    trailing: Text(snapshot.data![index]["state_id"].toString()),
+                  );
+              },);
+            }else{
+              return Text("Error");
+            }
+          },
+        ),
+        floatingActionButton:FloatingActionButton(
+          onPressed: () {
+            showDialog(context: context, builder: (context) {
+              TextEditingController state = TextEditingController();
+              return AlertDialog(
+                title: Text("Add"),
+                content: TextField(
+                  controller: state,
+                ),
+                actions: [
+                  ElevatedButton(onPressed: () async{
+                   await databse.insertState({"state_name" : state.text});
+                   Navigator.of(context).pop();
+                  }, child: Text("Submit"))
+                ],
+              );
+            },).then((value) {
+              setState(() {
+
+              });
+            },);
+          },
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
