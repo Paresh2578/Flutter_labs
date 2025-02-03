@@ -42,35 +42,88 @@ class _DemoState extends State<Demo> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(snapshot.data![index]["state_name"]),
-                    trailing: Text(snapshot.data![index]["state_id"].toString()),
+                    trailing: Container(
+                      width: 100,
+                      child: Row(
+                        children: [
+                          IconButton(onPressed: () async {
+                            await databse.deleteState(snapshot.data![index]["state_id"]);
+                            setState(() {
+                              
+                            });
+
+                          }, icon: Icon(Icons.delete)),
+                          IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  TextEditingController state = TextEditingController(
+                                      text: snapshot.data![index]["state_name"]);
+                                  return AlertDialog(
+                                    title: Text("Edit"),
+                                    content: TextField(
+                                      controller: state,
+                                    ),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () async {
+                                            await databse.updateState({
+                                              "state_id": snapshot.data![index]
+                                                  ["state_id"],
+                                              "state_name": state.text
+                                            });
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("Edit"))
+                                    ],
+                                  );
+                                },
+                              ).then(
+                                (value) {
+                                  setState(() {});
+                                },
+                              );
+                            },
+                            icon: Icon(Icons.edit),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
-              },);
-            }else{
+                },
+              );
+            } else {
               return Text("Error");
             }
           },
         ),
-        floatingActionButton:FloatingActionButton(
+        floatingActionButton: FloatingActionButton(
           onPressed: () {
-            showDialog(context: context, builder: (context) {
-              TextEditingController state = TextEditingController();
-              return AlertDialog(
-                title: Text("Add"),
-                content: TextField(
-                  controller: state,
-                ),
-                actions: [
-                  ElevatedButton(onPressed: () async{
-                   await databse.insertState({"state_name" : state.text});
-                   Navigator.of(context).pop();
-                  }, child: Text("Submit"))
-                ],
-              );
-            },).then((value) {
-              setState(() {
-
-              });
-            },);
+            showDialog(
+              context: context,
+              builder: (context) {
+                TextEditingController state = TextEditingController();
+                return AlertDialog(
+                  title: Text("Add"),
+                  content: TextField(
+                    controller: state,
+                  ),
+                  actions: [
+                    ElevatedButton(
+                        onPressed: () async {
+                          await databse.insertState({"state_name": state.text});
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Submit"))
+                  ],
+                );
+              },
+            ).then(
+              (value) {
+                setState(() {});
+              },
+            );
           },
           child: Icon(Icons.add),
         ),
