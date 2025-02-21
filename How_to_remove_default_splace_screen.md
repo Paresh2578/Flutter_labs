@@ -1,4 +1,4 @@
-1. app/src/main/res/values/styles.xml
+## 1. app/src/main/res/values/styles.xml
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -16,14 +16,14 @@
 </resources>
 ```
 
-3. app/src/main/AndroidManifest.xml
-    ```
+## 2. app/src/main/AndroidManifest.xml
+ ```
     android:theme="@style/Theme.App.Transparent"
-    ```
-5. app/build.gradle
-  ```
+```
+## 3. app/build.gradle
+```
     dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.0'
 }
+```
 
-    ```
