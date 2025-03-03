@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:p_1/AboutPage.dart';
-import 'package:p_1/Contact.dart';
-import 'package:p_1/HomePage.dart';
-import 'package:p_1/database/database.dart';
+import 'package:untitled1/Page1.dart';
+import 'package:untitled1/Page2.dart';
+
+import 'Exam/User.dart';
+import 'apiService.dart';
 
 class Demo extends StatefulWidget {
   const Demo({super.key});
@@ -13,121 +13,76 @@ class Demo extends StatefulWidget {
 }
 
 class _DemoState extends State<Demo> {
-  MyDatabase databse = MyDatabase();
+  Apiservice apiservice = Apiservice();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // selectAll();
+    print("call *******");
+    getAllData();
   }
 
-  Future<void> selectAll() async {
-    // await databse.insertState();
-    await databse.selectAllState();
+  Future<void> getAllData() async {
+   await apiservice.getAllUser();
   }
-
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: FutureBuilder(
-          future: databse.selectAllState(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(snapshot.data![index]["state_name"]),
-                    trailing: Container(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(onPressed: () async {
-                            await databse.deleteState(snapshot.data![index]["state_id"]);
-                            setState(() {
-                              
-                            });
+    return Scaffold(
+      appBar: AppBar(
 
-                          }, icon: Icon(Icons.delete)),
-                          IconButton(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  TextEditingController state = TextEditingController(
-                                      text: snapshot.data![index]["state_name"]);
-                                  return AlertDialog(
-                                    title: Text("Edit"),
-                                    content: TextField(
-                                      controller: state,
-                                    ),
-                                    actions: [
-                                      ElevatedButton(
-                                          onPressed: () async {
-                                            await databse.updateState({
-                                              "state_id": snapshot.data![index]
-                                                  ["state_id"],
-                                              "state_name": state.text
-                                            });
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text("Edit"))
-                                    ],
-                                  );
-                                },
-                              ).then(
-                                (value) {
-                                  setState(() {});
-                                },
-                              );
-                            },
-                            icon: Icon(Icons.edit),
-                          ),
-                        ],
-                      ),
-                    ),
+      ),
+      body: FutureBuilder(
+        future: apiservice.getAllUser(),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return CircularProgressIndicator();
+          }else if(snapshot.hasData){
+            List<User> data = snapshot.data!;
+
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+              return ListTile(
+                title:Text(data[index].user_name),
+                trailing: Text(data[index].user_id),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => Page2(id: data[index].user_id),)
                   );
                 },
               );
-            } else {
-              return Text("Error");
-            }
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                TextEditingController state = TextEditingController();
-                return AlertDialog(
-                  title: Text("Add"),
-                  content: TextField(
-                    controller: state,
-                  ),
-                  actions: [
-                    ElevatedButton(
-                        onPressed: () async {
-                          await databse.insertState({"state_name": state.text});
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("Submit"))
-                  ],
-                );
-              },
-            ).then(
-              (value) {
-                setState(() {});
-              },
+            },);
+          }else{
+            return Text("error");
+          }
+        },
+      ),
+      floatingActionButton:FloatingActionButton(
+        onPressed: () {
+          showDialog(context: context, builder: (context) {
+            TextEditingController name = TextEditingController();
+           return AlertDialog(
+             title: Text("Add"),
+             content: TextField(
+               controller: name,
+             ),
+             actions: [
+               ElevatedButton(onPressed: () async {
+                await apiservice.addUser(User(user_id: "12", user_name: name.text));
+                Navigator.of(context).pop();
+               }, child: Text("Add"))
+             ],
             );
-          },
-          child: Icon(Icons.add),
-        ),
+          },).then((value) {
+            setState(() {
+              
+            });
+          },);
+        },
+        child: Icon(Icons.add),
       ),
     );
+
   }
 }
